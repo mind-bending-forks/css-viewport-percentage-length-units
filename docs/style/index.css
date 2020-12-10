@@ -1,0 +1,940 @@
+body
+{
+  padding: 1rem;
+}
+.key
+{
+  padding: 0.5rem;
+  max-width: 10rem;
+}
+.key ul
+{
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+.key li
+{
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.canvas
+{
+  box-sizing: border-box;
+  padding: 5%;
+  position: relative;
+}
+.canvas-area
+{
+  box-sizing: border-box;
+  position: absolute;
+}
+.canvas.content-size
+{
+  width: 100%;
+  max-width: 10rem;
+}
+.content-size
+{
+  background-color: lightgrey;
+}
+.toolbar
+{
+  background-color: yellow;
+}
+.initial-containing-block
+{
+  border: 0.5rem dotted red;
+}
+.visual-viewport
+{
+  border: 0.5rem dashed black;
+}
+.header
+{
+  background-color: green;
+  z-index: 10;
+}
+.footer
+{
+  background-color: green;
+  z-index: 10;
+}
+.main
+{
+  z-index: 0;
+}
+figure
+{
+  width: 100%;
+}
+figcaption
+{
+  text-align: center;
+}
+
+#fig-basics-scroll .initial-containing-block
+, #fig-basics-scroll .global-coord-system .visual-viewport
+{
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 25%;
+  animation-name: basics-scroll;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes basics-scroll
+{
+  0%
+  {
+    top: 0;
+  }
+
+  20%
+  {
+    top: 0;
+  }
+
+  100%
+  {
+    top: 75%;
+  }
+}
+
+#fig-basics-zoom .global-coord-system .content-size
+{
+  max-width: 10rem;
+  font-size: 100%;
+  line-height: 1.2;
+  height: 40rem;
+  overflow-y: hidden;
+  animation-name: basics-zoom-content-size;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes basics-zoom-content-size
+{
+  0%
+  {
+    max-width: 10rem;
+    font-size: 100%;
+  }
+
+  20%
+  {
+    max-width: 10rem;
+    font-size: 100%;
+  }
+
+  100%
+  {
+    max-width: 20rem;
+    font-size: 200%;
+  }
+}
+#fig-basics-zoom .global-coord-system .initial-containing-block
+{
+  top: 5rem;
+  left: 0;
+  width: 100%;
+  height: 10rem;
+  animation-name: basics-zoom-initial-containing-block;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes basics-zoom-initial-containing-block
+{
+  0%
+  {
+    top: 5rem;
+    height: 10rem;
+  }
+
+  20%
+  {
+    top: 5rem;
+    height: 10rem;
+  }
+
+  100%
+  {
+    top: 10rem;
+    height: 20rem;
+  }
+}
+#fig-basics-zoom .global-coord-system .visual-viewport
+{
+  top: 5rem;
+  left: 0;
+  width: 100%;
+  height: 10rem;
+  animation-name: basics-zoom-visual-viewport;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes basics-zoom-visual-viewport
+{
+  0%
+  {
+    top: 5rem;
+    left: 0;
+    width: 100%;
+  }
+
+  20%
+  {
+    top: 5rem;
+    left: 0;
+    width: 100%;
+  }
+
+  100%
+  {
+    top: 15rem;
+    left: 25%;
+    width: 50%;
+  }
+}
+
+#fig-hide-toolbar .canvas.content-size
+{
+  padding-top: 2rem;
+  padding-bottom: 0;
+  animation-name: scroll-content-size;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes scroll-content-size
+{
+  0% {
+    padding-top: 2rem;
+    padding-bottom: 0;
+  }
+  25% {
+    padding-top: 0;
+    padding-bottom: 2rem;
+  }
+  100% {
+    padding-top: 0;
+    padding-bottom: 2rem;
+  }
+}
+#fig-hide-toolbar .canvas .toolbar
+{
+  width: 100%;
+  height: 2rem;
+  opacity: 1;
+  left: 0;
+  top: 0;
+  animation-name: hide-toolbar;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes hide-toolbar
+{
+  0% {
+    opacity: 1;
+    top: 0;
+  }
+  25% {
+    opacity: 0;
+    top: -2rem;
+  }
+  100% {
+    opacity: 0;
+    top: -2rem;
+  }
+}
+#fig-hide-toolbar .canvas .initial-containing-block
+{
+  width: 100%;
+  height: 20rem;
+  left: 0;
+  top: 2rem;
+  animation-name: scroll-initial-containing-block;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes scroll-initial-containing-block
+{
+  0% {
+    top: 2rem;
+  }
+  25% {
+    top: 2rem;
+  }
+  100% {
+    top: 8rem;
+  }
+}
+#fig-hide-toolbar .canvas .visual-viewport
+{
+  width: 100%;
+  left: 0;
+  top: 2rem;
+  height: 18rem;
+  animation-name: scroll-visual-viewport;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes scroll-visual-viewport
+{
+  0% {
+    top: 2rem;
+    height: 18rem;
+  }
+  25% {
+    top: 2rem;
+    height: 20rem;
+  }
+  100% {
+    top: 8rem;
+    height: 20rem;
+  }
+}
+
+#fig-hide-toolbar-holy-grail .global-coord-system
+{
+  margin-bottom: 2rem;
+}
+#fig-hide-toolbar-holy-grail .canvas.content-size
+{
+  height: 28rem;
+}
+#fig-hide-toolbar-holy-grail .main-outer
+{
+  height: 100%;
+  overflow-y: hidden;
+}
+#fig-hide-toolbar-holy-grail .main
+{
+  height: 45rem;
+  margin-top: 0;
+  margin-bottom: 0;
+  animation-name: scroll-main-holy-grail;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes scroll-main-holy-grail
+{
+  0%
+  {
+    margin-top: 0;
+  }
+  75%
+  {
+    margin-top: -22.5rem;
+  }
+  100%
+  {
+    margin-top: -20.5rem;
+  }
+}
+#fig-hide-toolbar-holy-grail .body
+{
+  flex-direction: column;
+  display: flex;
+  border: 0.5rem;
+  box-sizing: border-box;
+  height: 100%;
+  margin-top: 2rem;
+  margin-bottom: 0rem;
+  animation-name: scroll-content-size-holy-grail;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes scroll-content-size-holy-grail
+{
+  0% {
+    margin-top: 2rem;
+    margin-bottom: 0;
+  }
+  75% {
+    margin-top: 2rem;
+    margin-bottom: 0;
+  }
+  100% {
+    margin-top: 0;
+    margin-bottom: 2rem;
+  }
+}
+#fig-hide-toolbar-holy-grail .canvas .toolbar
+{
+  width: 100%;
+  height: 2rem;
+  opacity: 1;
+  left: 0;
+  top: 0;
+  animation-name: hide-toolbar-holy-grail;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes hide-toolbar-holy-grail
+{
+  0% {
+    opacity: 1;
+    top: 0;
+  }
+  75% {
+    opacity: 1;
+    top: 0;
+  }
+  100% {
+    opacity: 0;
+    top: -2rem;
+  }
+}
+#fig-hide-toolbar-holy-grail .canvas .initial-containing-block
+{
+  width: 100%;
+  height: 28rem;
+  left: 0;
+  top: 2rem;
+  animation-name: scroll-initial-containing-block-holy-grail;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes scroll-initial-containing-block-holy-grail
+{
+  0% {
+    top: 2rem;
+  }
+  75% {
+    top: 2rem;
+  }
+  100% {
+    top: 0;
+  }
+}
+#fig-hide-toolbar-holy-grail .canvas .visual-viewport
+{
+  width: 100%;
+  left: 0;
+  top: 2rem;
+  height: 26rem;
+  animation-name: scroll-visual-viewport-holy-grail;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes scroll-visual-viewport-holy-grail
+{
+  0% {
+    top: 2rem;
+    height: 26rem;
+  }
+  75% {
+    top: 2rem;
+    height: 26rem;
+  }
+  100% {
+    top: 0;
+    height: 28rem;
+  }
+}
+blockquote
+{
+  border-left: 0.25em solid grey;
+  padding-left: 0.5em;
+  font-style: italic;
+}
+
+#fig-design-expand-contract .canvas.content-size .content
+{
+  opacity: 0;
+  animation-name: expand-contract-content;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes expand-contract-content
+{
+  0%
+  {
+    opacity: 0;
+  }
+  33%
+  {
+    opacity: 1;
+  }
+  66%
+  {
+    opacity: 1;
+  }
+  100%
+  {
+    opacity: 1;
+  }
+}
+#fig-design-expand-contract .canvas.content-size
+{
+  height: 20rem;
+  padding-top: 2rem;
+  padding-bottom: 0;
+  margin-bottom: 2rem;
+  animation-name: expand-contract-content-size;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+  overflow-y: hidden;
+}
+@keyframes expand-contract-content-size
+{
+  0%
+  {
+    padding-top: 2rem;
+    padding-bottom: 0;
+  }
+  33%
+  {
+    padding-top: 2rem;
+    padding-bottom: 0;
+  }
+  66%
+  {
+    padding-top: 0;
+    padding-bottom: 2rem;
+  }
+  100%
+  {
+    padding-top: 0;
+    padding-bottom: 2rem;
+  }
+}
+#fig-design-expand-contract .canvas .toolbar
+{
+  width: 100%;
+  height: 2rem;
+  opacity: 1;
+  left: 0;
+  top: 0;
+  animation-name: expand-contract-hide-toolbar;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes expand-contract-hide-toolbar
+{
+  0%
+  {
+    opacity: 1;
+    top: 0;
+  }
+  33%
+  {
+    opacity: 1;
+    top: 0;
+  }
+  66%
+  {
+    opacity: 0;
+    top: -2rem;
+  }
+  100%
+  {
+    opacity: 0;
+    top: -2rem;
+  }
+}
+#fig-design-expand-contract .canvas .initial-containing-block
+{
+  width: 100%;
+  height: 18rem;
+  left: 0;
+  top: 2rem;
+  animation-name: expand-contract-initial-containing-block;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes expand-contract-initial-containing-block
+{
+  0%
+  {
+    top: 2rem;
+    height: 18rem;
+  }
+  33%
+  {
+    top: 2rem;
+    height: 18rem;
+  }
+  66%
+  {
+    top: 0rem;
+    height: 20rem;
+  }
+  100%
+  {
+    top: 0rem;
+    height: 20rem;
+  }
+}
+#fig-design-expand-contract .canvas .visual-viewport
+{
+  width: 100%;
+  left: 0;
+  top: 2rem;
+  height: 18rem;
+  animation-name: expand-contract-visual-viewport;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes expand-contract-visual-viewport
+{
+  0%
+  {
+    top: 2rem;
+    height: 18rem;
+  }
+  33%
+  {
+    top: 2rem;
+    height: 18rem;
+  }
+  66%
+  {
+    top: 0rem;
+    height: 20rem;
+  }
+  100%
+  {
+    top: 0rem;
+    height: 20rem;
+  }
+}
+
+#fig-design-overlay .canvas.content-size .content
+{
+  opacity: 0;
+  animation-name: overlay-content;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes overlay-content
+{
+  0%
+  {
+    opacity: 0;
+  }
+  33%
+  {
+    opacity: 1;
+  }
+  66%
+  {
+    opacity: 1;
+  }
+  100%
+  {
+    opacity: 1;
+  }
+}
+#fig-design-overlay .canvas.content-size
+{
+  height: 20rem;
+  padding-top: 0;
+  padding-bottom: 0;
+  overflow-y: hidden;
+  margin-bottom: 2rem;
+}
+#fig-design-overlay .canvas .toolbar
+{
+  width: 100%;
+  height: 2rem;
+  opacity: 1;
+  left: 0;
+  bottom: 0;
+  animation-name: overlay-hide-toolbar;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes overlay-hide-toolbar
+{
+  0%
+  {
+    opacity: 1;
+    bottom: 0;
+  }
+  33%
+  {
+    opacity: 1;
+    bottom: 0;
+  }
+  66%
+  {
+    opacity: 0;
+    bottom: -2rem;
+  }
+  100%
+  {
+    opacity: 0;
+    bottom: -2rem;
+  }
+}
+#fig-design-overlay .canvas .initial-containing-block
+{
+  width: 100%;
+  height: 20rem;
+  left: 0;
+  top: 0;
+}
+#fig-design-overlay .canvas .visual-viewport
+{
+  width: 100%;
+  left: 0;
+  top: 0;
+  height: 18rem;
+  animation-name: overlay-visual-viewport;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes overlay-visual-viewport
+{
+  0%
+  {
+    height: 18rem;
+  }
+  33%
+  {
+    height: 18rem;
+  }
+  66%
+  {
+    height: 20rem;
+  }
+  100%
+  {
+    height: 20rem;
+  }
+}
+
+#fig-design-shift-truncate .canvas.content-size .content
+{
+  opacity: 0;
+  animation-name: shift-truncate-content;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes shift-truncate-content
+{
+  0%
+  {
+    opacity: 0;
+  }
+  33%
+  {
+    opacity: 1;
+  }
+  66%
+  {
+    opacity: 1;
+  }
+  100%
+  {
+    opacity: 1;
+  }
+}
+#fig-design-shift-truncate .canvas.content-size
+{
+  height: 22rem;
+  padding-top: 2rem;
+  padding-bottom: 0;
+  animation-name: shift-truncate-content-size;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+  overflow-y: hidden;
+}
+@keyframes shift-truncate-content-size
+{
+  0%
+  {
+    height: 22rem;
+    padding-top: 2rem;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  33%
+  {
+    height: 22rem;
+    padding-top: 2rem;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  66%
+  {
+    height: 20rem;
+    padding-top: 0;
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+  }
+  100%
+  {
+    height: 20rem;
+    padding-top: 0;
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+  }
+}
+#fig-design-shift-truncate .canvas .toolbar
+{
+  width: 100%;
+  height: 2rem;
+  opacity: 1;
+  left: 0;
+  top: 0;
+  animation-name: shift-truncate-hide-toolbar;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes shift-truncate-hide-toolbar
+{
+  0%
+  {
+    opacity: 1;
+    top: 0;
+  }
+  33%
+  {
+    opacity: 1;
+    top: 0;
+  }
+  66%
+  {
+    opacity: 0;
+    top: -2rem;
+  }
+  100%
+  {
+    opacity: 0;
+    top: -2rem;
+  }
+}
+#fig-design-shift-truncate .canvas .initial-containing-block
+{
+  width: 100%;
+  height: 20rem;
+  left: 0;
+  top: 2rem;
+  animation-name: shift-truncate-initial-containing-block;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes shift-truncate-initial-containing-block
+{
+  0%
+  {
+    top: 2rem;
+  }
+  33%
+  {
+    top: 2rem;
+  }
+  66%
+  {
+    top: 0rem;
+  }
+  100%
+  {
+    top: 0rem;
+  }
+}
+#fig-design-shift-truncate .canvas .visual-viewport
+{
+  width: 100%;
+  left: 0;
+  top: 2rem;
+  height: 18rem;
+  animation-name: shift-truncate-visual-viewport;
+  animation-duration: 8s;
+  animation-play-state: running;
+  animation-iteration-count: infinite;
+}
+@keyframes shift-truncate-visual-viewport
+{
+  0%
+  {
+    top: 2rem;
+    height: 18rem;
+  }
+  33%
+  {
+    top: 2rem;
+    height: 18rem;
+  }
+  66%
+  {
+    top: 0rem;
+    height: 20rem;
+  }
+  100%
+  {
+    top: 0rem;
+    height: 20rem;
+  }
+}
+
+/* Automatic section numbering in the TOC */
+nav ol
+{
+  counter-reset: toc;
+  list-style-type: none;
+}
+
+nav li>a:before
+{
+  content: counters(toc, ".") ".\00A0";
+  counter-increment: toc;
+}    
+
+
+/* Automatic section numbering applied to headers */
+.main
+{
+  counter-reset: h2;
+}
+.main>section
+{
+  counter-reset: h3;
+}
+.main>section>section
+{
+  counter-reset: h4;
+}
+
+.main h2:before
+{
+  counter-increment: h2;
+  content: counter(h2) ".\00A0";
+}
+.main h3:before
+{
+  counter-increment: h3;
+  content: counter(h2) "." counter(h3) ".\00A0";
+}
+.main h4:before
+{
+  counter-increment: h4;
+  content: counter(h2) "." counter(h3) "." counter(h4) ".\00A0";
+}

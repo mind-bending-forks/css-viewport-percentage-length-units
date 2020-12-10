@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en-gb">
+  <head>
+    <title>CSS Viewport-Percentage Length Units</title>
+    <meta charset="utf-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="style/bootstrap-4.5.3.min.css">
+    <link rel="stylesheet" href="style/index.css"> 
+  </head>
+  <body>
+    <article>
+      <header>
+        <h1>CSS Viewport-Percentage Length Units</h1>
+      </header>
+
+      <section class="jumbotron py-3">
+        <header>
+          <h2>About</h2>
+        </header>
+        <p>This article concerns viewport-percentage length units in CSS. It discusses current limitations to their usage on mobile browsers, and makes a proposal to modify the CSS specification to improve matters by guiding mobile browsers away from design features that result in truncated content and so poor user experience and in a way that will restore consistent behaviour across desktop and mobile when using viewport-percentage length units.</p>
+        <dl class="mb-0">
+          <dt>Author:</dt>
+          <dd><a href="https://github.com/mind-bending-forks">@mind-bending-forks</a></dd>
+          <dt>Date:</dt>
+          <dd>December 2020</dd>
+          <dt>Version:</dt>
+          <dd>1.0</dd>
+        </dl>
+        <nav>
+          <h3>Contents</h3>
+          <ol class="pl-0">
+            <li>
+              <a href="#sec-introduction">Introduction</a>
+              <ol>
+                <li><a href="#sec-basics">Basics</a></li>
+                <li><a href="#sec-viewport-percentage-length-units">Viewport-Percentage Length Units</a>
+                  <ol>
+                    <li><a href="#sec-uses">Uses</a></li>
+                  </ol>
+                </li>
+              </ol>
+            </li>
+            <li>
+              <a href="#sec-problems-with-viewport-percentage-length-units">Problems with Viewport-Percentage Length Units</a>
+              <ol>
+                <li><a href="#sec-simple-linear-layout-case">Simple Linear Layout Case</a></li>
+                <li><a href="#sec-100vh-layout-case"><code>100vh</code> Layout Case</a></li>
+                <li><a href="#sec-100vh-with-flexbox-holy-grail-case"><code>100vh</code> with Flexbox (Holy Grail) Case</a></li>
+                <li><a href="#sec-summary">Summary</a></li>
+              </ol>
+            </li>
+            <li><a href="#sec-current-approved-change-to-the-css-specification">Current (Approved!) Change to the CSS Specification</a></li>
+            <li>
+              <a href="#sec-alternative-proposal">Alternative Proposal</a>
+              <ol>
+                <li>
+                  <a href="#sec-css-specification">CSS Specification</a>
+                  <ol>
+                    <li><a href="#sec-consequences">Consequences</a></li>
+                  </ol>
+                </li>
+                <li><a href="#sec-mobile-browser-design">Mobile Browser Design</a></li>
+              </ol>
+            </li>
+            <li><a href="#sec-but-i-really-need-want-a-visual-viewport-percentage-length-unit">But I <em>really</em> need/want a <em>visual</em>-viewport-percentage length unit!</a></li>
+            <li><a href="#sec-conclusion">Conclusion</a></li>
+          </ol>
+         </nav>
+      </section>
+
+      <div class="main">
+        <section id="sec-introduction">
+          <header>
+            <h2>Introduction</h2>
+          </header>
+  
+          <p>Before we start, we need to get to grips with some basic technical details relating to CSS viewport-percentage length units and how they interact with web browsers and to pin down some terminology. From this point on I'll be using the terminology <dfn>web browser</dfn>, whereas the CSS standard uses the term <dfn>user agent</dfn>, presumably because CSS can be applied in a broader context than just HTML documents in a web browser. In this section, to keep things simple, I'll be presenting how things used to work before toolbars (e.g. address bar) that hide and reveal themselves were introduced into mobile browsers and complicated matters.</p>
+  
+          <p class="mb-0">The key for the animated figures is:</p>
+  
+          <div id="fig-key" class="key mx-auto">
+            <ul>
+              <li><div class="content-size text-center">Canvas. All content</div></li>
+              <li><div class="initial-containing-block text-center">Initial Containing Block</div></li>
+              <li><div class="visual-viewport text-center">Visual Viewport</div></li>
+              <li><div class="toolbar text-center">Toolbar</div></li>
+            </ul>
+          </div>
+  
+          <section id="sec-basics">
+            <header>
+              <h3>Basics</h3>
+            </header>
+            <p>We will imagine that the entirety of our web content, when laid out, exists on some kind of a <em>canvas</em> on which there is coordinate system relative to which everything is positioned. (I'm not talking about HTML <code>&lt;canvas&gt;</code> here, but it seemed like a good word.) We will need to understand the terminology used to describe the various areas on that canvas, since elements may be positioned differently with respect to those areas depending on how they are styled. This is covered in detail in the <a href="https://github.com/bokand/bokand.github.io/blob/master/web_viewports_explainer.md">Web Viewports Explainer by David Bokan</a>, but I'll summarise the key points for my purposes as I understand them here, skipping over some details like how the positioning of elements with <code>position: fixed;</code> works.</p>
+            <p>First let's consider a simple HTML document with plain linear content and default positioning, like this one, and let's imagine that it has just been loaded by the web browser. See <a href="#fig-basics-scroll">Figure 1</a> or <a href="examples/basic-linear.html">this live example</a>. The <dfn>canvas</dfn> encompasses all the content of the document, and in David Bokand's explainer it is referred to as the <dfn>Content Size</dfn>. The area that can be seen through the browser window is the <dfn>visual viewport</dfn>. We'll come onto the initial containing block later, but initially, in this example at least, it is the same as the visual viewport. Next imagine that we start scrolling down the page. The visual viewport shifts down relative to the canvas, exposing a different part of it.</p>
+  
+            <div id="fig-basics-scroll" class="d-flex flex-column align-items-center">
+              <figure class="card">
+                <div class="card-body d-flex flex-row justify-content-center">
+                  <div class="global-coord-system">
+                    <div class="canvas content-size">
+                      <div>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                        <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                      </div>
+                      <div class="canvas-area initial-containing-block">
+                      </div>
+                      <div class="canvas-area visual-viewport">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <figcaption class="card-footer">Figure 1: Content areas for simple HTML document on first load (zero pinch-zoom), followed by subsequent scroll. See <a href="#fig-key">the key</a>.</figcaption>
+              </figure>  
+            </div>
+  
+            <p>Next imagine that we start to zoom into the page by <em>un-pinching</em> on a mobile browser. I'll refer to this action as <dfn>pinch-zoom</dfn> from this point on. (This is different to the zooming that typically occurs on desktop browsers, which maintains the overall content width while increasing the scale of various items such as fonts and provoking reflow of the content.) This is where the significance of the initial containing block comes in. As we pinch-zoom, the content expands uniformly. As the content expands the initial containing block expands at the same rate, keeping its position relative to the content, and so avoiding the need to reflow the content. The visual viewport remains fixed in size, and so shrinks relative to the initial containing block. See <a href="#fig-basics-zoom">Figure 2</a>.</p>
+  
+            <div id="fig-basics-zoom" class="d-flex flex-column align-items-center">
+              <figure class="card">
+                <div class="card-body d-flex flex-row justify-content-center">
+                  <div class="global-coord-system">
+                    <div class="canvas content-size">
+                      <div>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                        <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        </div>
+                      <div class="canvas-area initial-containing-block">
+                      </div>
+                      <div class="canvas-area visual-viewport">
+                      </div>
+                    </div>  
+                  </div>
+                </div>
+                <figcaption class="card-footer">Figure 2: Content areas for simple HTML document when pinch-zooming on a mobile browser. See <a href="#fig-key">the key</a>.</figcaption>
+              </figure>  
+            </div>
+  
+            <aside>Aside: I don't know about anyone else, but I find use of the word "initial" in "initial containing block" slightly confusing. To me, initial tends to imply that the quantity is calculated at the start (e.g. on page load) and that it is static, whereas it is very much dynamic, adapting to changes in scroll, pinch-zoom, and adapting to changes in the visual viewport size (e.g. if the browser window is rotated or resized.)</aside>
+  
+          </section>
+  
+          <section id="sec-viewport-percentage-length-units">
+            <header><h3>Viewport-Percentage Length Units</h3></header>
+  
+            <p>The CSS standard defines a number of <a href="https://www.w3.org/TR/css-values-3/#viewport-relative-lengths">viewport-percentage length units</a>, which are illustrated in <a href="#fig-viewport-percentage-length-units">Figure 3</a> (for zero pinch-zoom and coincident visual viewport and initial containing block):</p>
+  
+            <dl>
+              <dt><dfn>vw unit</dfn></dt>
+              <dd>A length that is equal to 1% of the width of the Initial Containing Block</dd>
+              <dt><dfn>vh unit</dfn></dt>
+              <dd>A length that is equal to 1% of the height of the Initial Containing Block</dd>
+              <dt><dfn>vmin unit</dfn></dt>
+              <dd>A length equal to the smaller of vw or vh</dd>
+              <dt><dfn>vmax unit</dfn></dt>
+              <dd>A length equal to the larger of vw or vh</dd>
+            </dl>
+  
+            <p>So, while these units are called viewport-percentage length units, they are not technically calculated relative to the <em>visual</em> viewport. They are calculated relative to the initial containing block. However, on desktop browsers and on mobile browsers prior to the introduction of toolbars that hide and reveal themselves, the visual viewport and the initial containing block are coincident at zero pinch-zoom. Furthermore, they only deviate on pinch-zoom and in a way that is consistent with the way zooming works on mobile devices.</p>
+  
+            <div id="fig-viewport-percentage-units" class="d-flex flex-column align-items-center">
+              <figure class="card">
+                <div class="card-body text-center">
+                  <img class="img-fluid" width="788" height="424" alt="a) Illustration of mobile device in portrait mode. Width of viewport is 100vw=100vmin. Height of viewport is 100vh=100vmax. b) Illustration of mobile device in portrait mode. Width of viewport is 100vw=100vmax. Height of viewport is 100vh=100vmin." src="media/viewport-percentage-length-units.opt.svg">
+                </div>
+                <figcaption class="card-footer">Figure 3: Viewport-percentage length units at zero pinch-zoom</figcaption>
+              </figure>
+            </div>
+  
+            <section id="sec-uses">
+
+              <header><h4>Uses</h4></header>
+
+              <p>Viewport-percentage length units are used for a variety of related purposes. See <a href="#fig-viewport-percentage-unit-uses">Figure 4</a>. These include:</p>
+
+              <ol>
+                <li><strong>Positioning:</strong> Allows content to be positioned relative to the visual viewport at zero pinch-zoom, and for it to retain its location relative to the content on pinch-zoom. An example of this could be the positioning of a modal message box over the content so that it fills a large fraction of the visual viewport and remains centred.</li>
+                <li><strong>Sizing:</strong> Allows content to be sized as a fraction of the visual viewport at zero pinch-zoom, and for it to retain its size relative to the content on pinch-zoom. <a href="examples/holy-grail.html">One example of this</a> is in combination with flexbox to specify a container that has a height equal to that of the visual viewport, and then to use flexbox to place a fixed header at the top of the visual viewport, a fixed footer at the bottom of the visual viewport, and to create a central scrollable region with a height that is automatically determined to be the remaining height. This is sometimes referred to as the <a href="https://en.wikipedia.org/wiki/Holy_Grail_(web_design)">holy grail layout</a>, especially when the central region is split into multiple columns. Until the arrival of flexbox and viewport-percentage length units (and CSS grid), it was not possible to have a central scrollable region with automatically and correctly calculated height without recourse to javascript.</li>
+                <li><strong>Scaling:</strong> Allows content to be scaled with the visual viewport at zero pinch-zoom, and for it to retain its size relative to the content on pinch-zoom. One example of this is for <a href="https://www.madebymike.com.au/writing/precise-control-responsive-typography/">responsive font-size scaling.</a></li>
+              </ol>
+
+              <div id="fig-viewport-percentage-unit-uses" class="d-flex flex-column align-items-center">
+                <figure class="card">
+                  <div class="card-body text-center">
+                    <img class="img-fluid" width="1134" height="538" alt="1. Illustration of mobile device in portrait mode with central modal, and coordinate of top-left corner of the model with respect to the viewport highlighted. 2. Illustration of mobile device in portrait model with top 30% of viewport identified as a fixed zone, and the remainder scrolling content. 3. Illustration of a large desktop monitor in landscape mode with the viewport filled by a serif letter A, and beneath it, a small mobile device in landscape mode with the viewport filled by a serif letter A." src="media/viewport-percentage-length-unit-uses.opt.svg">
+                  </div>
+                  <figcaption class="card-footer">Figure 4: Uses of viewport-percentage length units: 1. Positioning. 2. Sizing. 3. Scaling. </figcaption>
+                </figure>
+              </div>
+            </section>
+  
+          </section>
+        </section>
+  
+        <section id="sec-problems-with-viewport-percentage-length-units">
+  
+          <header><h2>Problems with Viewport-Percentage Length Units</h2></header>
+  
+          <p>A number of problems have arisen with the use of viewport-percentage length units on mobile devices. These started with Safari on iOS as it implemented functionality that would allow toolbars to be hidden. Its chosen design tied visibility of the toolbars into scrolling of the page, such that scrolling down the page would hide the toolbars, and scrolling back up would re-show them. The problems caused by this design and its implementation then transferred over to Chrome for Android and most recently Firefox for Android as those browsers converged on a similar design concept to Safari's.</p>
+  
+          <p>The challenge that the browser developers faced in implementing such a design was twofold. It appears that the initial approach attempted was to follow the CSS specification precisely, making the initial containing block coincident with the visual viewport at zero pinch-zoom. In the new browser design the toolbars would be visible initially. Then, as the user scrolled down and it disappeared, which occurred in a smooth transition so that the user can see what was going on, the visual viewport would grow in size to make use of the full space available. This meant that positioning, sizing and scaling of elements that use viewport-percentage length units would change, and the content would need to be reflowed. The second challenge was that this is happening as the user is scrolling, while the height of the user's scroll region is expanding. It is reported that this can result in poor user experience and that it requires significant graphics/computational power to do smoothly. So, the Safari iOS developers looked for a different scheme that would improve matters.</p>
+  
+          <p>They did so by fixing the initial containing block's size (at zero pinch-zoom) to be the maximum possible visual viewport size; that is, calculated <em>without the toolbars</em> and resulting in an area that is <em>larger than the visual viewport's initial size</em>. The initial containing block is initially positioned below the upper toolbar (address bar), having the same origin as the visual viewport, such that the bottom of the content is truncated. However, if the user scrolls, the toolbars are moved out the way and the initial containing block is shifted up - without being scaled, until it is all visible. Then, scrolling proceeds as per normal.</p>
+  
+          <section id="sec-simple-linear-layout-case">
+  
+            <header><h3>Simple Linear Layout Case</h3></header>
+  
+            <p>The scheme described above is illustrated for a simple linear layout with a single upper toolbar in <a href="#fig-hide-toolbar">Figure 5</a> and the behaviour <a href="examples/basic-linear.html">can be tested on different mobile browsers</a>. Behaviour may vary slightly depending on the number of toolbars and whether they are positioned at the top or the bottom of the page, such as whether hide or reveal is linked to scroll in a particular direction.</p>
+  
+            <p>In one sense the design was a triumph. By avoiding the change in size of the initial containing block, it was possible to avoid reflowing the content, resulting in a much more seamless transition. However, it was also a compromise: Whenever the initial containing block and visual viewport cease to be coincident at zero pinch-zoom, it means that part of content the user should be seeing is cut off. This can be seen at the start of the animation in <a href="#fig-hide-toolbar">Figure 5</a>, with the black dashed line (the visual viewport) initially being smaller than the red dotted line (the initial containing block).</p>
+  
+            <p>For this simple linear layout, the truncation of content persists until the user starts to scroll (if indeed they do). The user may have no indication or idea that there is truncated content beneath the bottom of the viewport. <a href="https://bugs.webkit.org/show_bug.cgi?id=141832">This has been a source of frustration for some developers since it was first implemented.</a> However, only a small area of content is being truncated and for this linear layout it is only temporarily (until the user scrolls, assuming they do so), and so perhaps only a temporary and minor deviation from the CSS specification. As such, it appears that the developers, being satisfied with the effect and presumably having put a significant amount of effort into the design and implementation, must have decided that it was a reasonable compromise that enables maximisation of the area available for content on mobile devices, and it was retained as is. Despite subsequent complaints from developers, the design hasn't changed. Rather, the design has been adopted by Chrome and Firefox for Android too.</p>
+  
+            <p>It should also be noted that if there is insufficient content to overflow the visual viewport (with toolbars), such that the content is not scrollable, then in some mobile browsers it is not possible to trigger hide/reveal of the toolbars at all. While this does not mean that content is truncated, it does mean that the theoretical maximum size viewport is never accessible for the display of background imagery, for example.</p>
+    
+            <p>There are some situations where the situation is worse than that described above, and this is currently affecting all mobile browsers. We will consider two such cases next.</p>
+  
+            <div id="fig-hide-toolbar" class="d-flex flex-column align-items-center">
+              <figure class="card">
+                <div class="card-body d-flex flex-row justify-content-center">
+                  <div class="global-coord-system">
+                    <div class="canvas content-size">
+                      <div>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                        <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                      </div>
+                      <div class="canvas-area toolbar">
+                        http://...
+                      </div>
+                      <div class="canvas-area initial-containing-block">
+                      </div>
+                      <div class="canvas-area visual-viewport">
+                      </div>
+                    </div>  
+                  </div>
+                </div>
+                <figcaption class="card-footer">Figure 5: Illustration of how a single toolbar may be hidden on scroll for linear content on mobile browsers. See <a href="#fig-key">the key</a>.</figcaption>
+              </figure>  
+            </div>
+          </section>
+  
+          <section id="sec-100vh-layout-case">
+            <header><h3><code>100vh</code> Layout Case</h3></header>
+  
+            <p>Next we will consider <a href="examples/100vh.html">a basic full-height layout</a> (with no overflowing/scrollable elements for simplicity), designed to take up 100% of the viewport by making the height of the <code>body</code> element <code>100vh</code>.</p>
+
+            <pre><code>&lt;!doctype html&gt;
+&lt;html lang=&quot;en-gb&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot;&gt;
+    &lt;title&gt;100vh Layout&lt;/title&gt;
+    &lt;style&gt;
+* { margin: 0; }
+body { height: 100vh }
+main { height: 80%; background-color: grey; }
+header, footer { height: 10%; background-color: green; }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;header&gt;Header: start of content&lt;/header&gt;
+    &lt;main&gt;
+      &lt;p&gt;Some text&lt;/p&gt;
+    &lt;/main&gt;
+    &lt;footer&gt;Footer: end of content&lt;/footer&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+  
+            <p>In terms of toolbar hiding, this behaves somewhat similarly to the simple linear layout case illustrated in <a href="#fig-hide-toolbar">Figure 5</a> above (despite the fact that the content would ordinarily not be scrollable or require scrolling).</p>
+            
+            <ul>
+              <li>On Chrome for Android, the bottom of the page is cut off on page load. Scrolling down/swiping up slides the toolbar out the way and moves the content up to take its place (most of the time, not always in my experience), revealing the full extent of the content.</li>
+              <li>On Firefox for Android, the bottom of the page is cut off on page load. Firefox for Android is currently bugged and does not expose the truncated content at all when the address bar is at the bottom, and the initial containing block shrinks when the address bar is at the top and moved out the way, causing an unsightly white region at the bottom. This has been partially addressed in Firefox Nightly for Android, with the addres bar moving out the way when it is positioned at the bottom. However, it is still currently buggy. The initial containing block is still initially truncated. When the address bar hides and the content slides up, it still exposes an initial containing block (content area) that is <em>smaller</em> than the visual viewport and a white band underneath (as of 10 Dec 2020).</li>
+              <li>On Safari for iOS, the content is always partially truncated by a toolbar. It is possible to scroll to view the entity of the content, but scrolling does not provoke the toolbars to hide in a way that exposes the full content without truncation.</li>
+            </ul>
+  
+            <p>The situation here is different to the basic linear layout with scroll since such content is likely designed with the expectation that all of it will be visible at all times, and the user also may have little if any expectation of a need to scroll to reveal the truncated content - if indeed they know that there is any truncated content. It also results in a discrepancy between the way desktop browsers behave - for which all the content is always visible without the need to scroll, and mobile browsers work, where content is truncated until the user scrolls/swipes. This behaviour has been <a href="https://chanind.github.io/javascript/2019/09/28/avoid-100vh-on-mobile-web.html">a source of frustration for developers expecting the entirety of their content to be visible all of the time</a>.</p>
+          </section>
+  
+          <section id="sec-100vh-with-flexbox-holy-grail-case">
+  
+            <header><h3><code>100vh</code> with Flexbox (Holy Grail) Case</h3></header>
+  
+            <p>Next we consider a <a href="examples/holy-grail.html">holy-grail-type example</a>, which is a variation on the <code>100vh</code> example above that additionally uses flexbox to provide a central scrollable region.</p>
+            
+            <pre><code>&lt;!doctype html&gt;
+&lt;html lang=&quot;en-gb&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot;&gt;
+    &lt;title&gt;100vh flexbox with fixed header & footer&lt;/title&gt;
+    &lt;style&gt;
+* { margin: 0; }
+body { height: 100vh; flex-direction: column; display: flex; }
+main { height: 100%; overflow-y: scroll; background-color: grey; }
+header, footer { background-color: green; }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;header&gt;Header: Always visible at the top&lt;/header&gt;
+    &lt;main&gt;
+      &lt;ol&gt;
+        &lt;li&gt;First item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Last item&lt;/li&gt;
+      &lt;/ol&gt;
+    &lt;/main&gt;
+    &lt;footer&gt;Footer: Always visible at the bottom&lt;/footer&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            
+            <p>As with the other examples, the bottom of what should be the viewport is truncated on page load. Scrolling for this example behaves differently to scrolling for the simple linear layout however and the result is worse. Unlike the simple linear case, whereby the toolbars may move out the way as soon as the user starts scrolling, this does not happen here any any mobile browser. Instead, the initial containing block (and so the bottom of the page) remains truncated until the user reaches the very end of the content in the central scroll region, and only then do the toolbars get out of the way and expose what ought to have been the full visual viewport. See <a href="#fig-hide-toolbar-holy-grail">Figure 6</a>. (I haven't got this animation working perfectly, but hopefully you get the idea. The footer and header needn't be the same height as the toolbar like in my example!) Once again, this is in contrast with the desktop experience where the footer is always visible.</p>
+  
+            <div id="fig-hide-toolbar-holy-grail" class="d-flex flex-column align-items-center">
+              <figure class="card">
+                <div class="card-body d-flex flex-row justify-content-center">
+                  <div class="global-coord-system">
+                    <div class="canvas content-size">
+                      <div class="body">
+                        <div class="header">Header</div>
+                        <div class="main-outer">
+                          <div class="main">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                          </div>
+                        </div>
+                        <div class="footer">Footer</div>
+                      </div>
+                      <div class="canvas-area toolbar">
+                        http://...
+                      </div>
+                      <div class="canvas-area initial-containing-block">
+                      </div>
+                      <div class="canvas-area visual-viewport">
+                      </div>
+                    </div>  
+                  </div>
+                </div>
+                <figcaption class="card-footer">Figure 6: An illustration of how a single upper toolbar may get hidden for <code>100vh</code> content with central scrollable region on scroll on mobile browsers. (The footer and toolbar are the same height here, but in general that needn't be the case.) The bottom of the content (footer in this example) is truncated until the user reaches the very end of the scroll region. See <a href="#fig-key">the key</a>.</figcaption>
+              </figure>  
+            </div>
+  
+            <p>This difference in toolbar behaviour between the basic linear example (in <a href="#fig-hide-toolbar">Figure 5</a>) and the <code>100vh</code> with Flexbox example (in <a href="#fig-hide-toolbar-holy-grail">Figure 6</a>) appears to be related to the way toolbar hiding/revealing is linked to scroll and the way scroll works. Within web content it is possible to define regions that are scrollable when they overflow their containing blocks. These can theoretically be nested. So it is possible to independently scroll subregions within the content in addition to scrolling the canvas itself if the content overflows the viewport. The way this appears to work is that once a given scrollable subregion has been scrolled to the end, it will trigger scrolling of its parent, and this pattern continues up the hierarchy of scrollable regions until the canvas itself scrolls.</p>
+  
+            <p>The issue then is that the toolbar hiding/revealing feature appears to have been setup to trigger on scrolling of the canvas only, not on any scrollable subregions (nor on the basic user action of touching then swiping when visiting a page). The basic reason for hooking into the canvas motion is understandable, since the concept is to tie the toolbar hide/reveal to actions that move you up and down the page, whereas a scrollable subregion does not, on first consideration, do that. However, what if the scrollable subregion is large (a large fraction of viewport height or greater than the viewport height) and has a large quantity of scrollable content in it? In that case, scrolling would currently not cause the toolbars to hide/reveal themselves and the user would be required to scroll through the entirety of the scrollable content before they can make the toolbars reappear or disappear. The holy grail example above is just one example of this. On Chrome for Android and Firefox for Android Nightly, swiping the fixed header/footer should in theory provoke the toolbar hide/reveal, but when the header or footer are too small or too close to the boundary, this does not appear to work, and is in any case an unnatural place for a user to attempt to scroll the page. So, one change to browser design that could help in this scenario would be to link the toolbar hide/reveal to the scrolling of any scrollable region that takes up a large fraction of the visual viewport.</p>
+  
+            <p>An alternative approach to improving matters that could help and which would help this particular case is to trigger the hide/reveal of the toolbars on scrolling of the <em>outermost scrollable region(s)</em>. Ordinarily, the outermost scrollable region is the canvas itself, but in this example the canvas is not scrollable, so the main central region becomes the outermost scrollable region and so that would also trigger the toolbar bar hide/reveal.</p>
+  
+            <p>Another alternative approach that would work in all cases would be to tie the toolbar hide/reveal into the basic user action of swiping and to always do this before any scroll. So, for example, if the user scrolls down the page, the toolbar(s) will first hide, moving all content into view, before the content scrolls in the swipe direction. If the user scrolls up the page, the toolbar(s) will first reappear, truncating some content, before the scroll action occurs.</p>
+          </section>
+  
+          <section id="sec-summary">
+            <header><h3>Summary</h3></header>
+  
+            <p>The issues here appear to be rooted in inadequacy of mobile browser design in the implementation of toolbar hide/reveal. There does not appear to be a problem with CSS viewport-percentage length units themselves. The key points are:</p>
+  
+            <ul>
+              <li>Mobile browsers implement an toolbar hidie/reveal feature. Having a dynamically resizing initial containing block can sometimes lead to unsightly reflow, and so current design avoids this. An inevitable consequence is that the initial containing block deviates from the visual viewport in the initial un-zoomed state, and this results in content that would ordinarily be visible being truncated while the toolbars are in view.</li>
+
+              <li>An issue arises because of the way the hide/reveal mechanism has been linked to scrolling of the underlying content. There are certain situations, such as when using viewport-percentage length units to create content that fills the viewport and when the content contains sub-regions that are scrollable, where the toolbars - and so truncated content persists. In the problem cases, this truncation persists indefinitely, or until a user scrolls/swipes the outermost content, and so only <em>if</em> they scroll/swipe the outermost content, and so only <em>if they can</em> scroll/swipe the outermost content (which is not currently always the case).</li>
+            </ul>
+          </section>
+  
+        </section>
+  
+        <section id="sec-current-approved-change-to-the-css-specification">
+          <header><h2>Current (Approved!) Change to the CSS Specification</h2></header>
+  
+          <p>The CSS working group have been attempting to improve matters for developers. <a href="https://github.com/w3c/csswg-drafts/issues/4329">A proposal to introduce a new viewport-percentage length unit has been approved.</a> While the name of the new unit is yet to be decided, the new unit defined to be equal to the 1% of the minimum possible visual viewport (ignoring form input controls like keyboards).</p>
+  
+          <p>The rationale behind this unit appears to be that some developers, such as those affected by initially truncated content in the <code>100vh</code> scenario, don't want their content truncated and are calling for a unit that is calculated relative to the visual viewport at all times. However, Safari developers had noted that in combination with their chosen toolbar hide/reveal concept, that this can result in poor user experience, and so that has been avoided. Instead, the proposed unit is a compromise intended to allow developers to restrict the size of their content so that it will fit entirely the page, even if part of the viewport is truncated.</p>
+  
+          <p>While this new unit may help, it only appears to do so in a very limited way, as far as I can tell:</p>
+  
+          <ul>
+            <li>In terms of scaling, given current browser implementations are effectively implementing <code>vh</code> as equal to 1% of the maximum possible viewport size, it offers no advantage over <code>vh</code>. The ratio of <code>vh</code> to the new unit is constant.</li>
+            <li>In terms of sizing, it helps a little, since it is possible to use it to size something in such a way that it is guaranteed to fit within the visual viewport.</li>
+            <li>However, in terms of positioning relative to the viewport, it doesn't help, since the user does not know which part of the initial containing block will be truncated by the browser and when (noting that current design may place the toolbar(s) at the top or the bottom). The current tendency is for mobile browsers to truncate the bottom of the page by shifting the content down or overlaying the toolbars over the content when if there is a single toolbar at the bottom, but that could change if browsers changed approach.</li>
+          </ul>
+  
+          <p>In addition, the current draft text updates the definition of <code>vh</code> to be equal to 1% of the maximum possible viewport size. While it is true that current mobile browser design is doing something that happens to be equivalent to that at present, if browser design is changed in future, this also might change. (For example, browsers could opt to make the initial containing block coincident with the visual viewport at zero pinch zoom for <code>100vh</code> cases only.) Current browser design isn't ideal at present given the problems described above, so in my view it would be better not undertake any action that might make it difficult to move away from it later.</p>
+        </section>
+  
+        <section id="sec-alternative-proposal">
+  
+          <header><h2>Alternative Proposal</h2></header>
+  
+          <p>I propose the following way forward in terms of the CSS Specification and mobile browser design.</p>
+  
+          <section id="sec-css-specification">
+            <header>
+              <h3>CSS Specification</h3>
+            </header>
+  
+            <p>From a CSS specification point of view, it can be seen that the problems are arising when, at zero pinch-zoom, browsers are introducing scenarios whereby the initial containing block is not coincident with the visual viewport at zero pinch-zoom. As mentioned above, this should be avoided, since any divergence of the two implies content that ought to be visible to the user will be truncated, possibly without the user knowing anything about it.</p>
+  
+            <p>So, should browsers be allowed to let the initial containing block diverge from the visual viewport at all? I think that having some user interface, whether that be an toolbar or form input keyboard, temporarily overlay the content is acceptable, provided it gets out the way as soon as it's not needed. Ideally, it should be obvious to the user when content is being obscured (for example, by overlaying the content and using a translucent background such that a hint of the obscured content can be seen). Tying the hide/reveal only into some unrelated action that a user may or may not undertake, such as scrolling the content, is not ideal. As already identified, in many situations allowing a temporary divergence of the initial containing block and visual viewport would be preferable to provoking a content reflow (which was the initial problem). However, it should be clear from the specification that if some user interface is going to unnecessarily remain overlapping or truncating the initial containing block for any significant period of time, then this should result in a realignment of the initial containing block with the visual viewport to avoid the problems with truncation of content encountered above.</p>
+  
+            <p>Hence, I propose that the existing viewport-percentage length units retain their current definitions, but with the following additional caveat on the definition of the initial containing block:</p>
+  
+            <blockquote>
+  
+              <p>At zero pinch-zoom, the user agent may allow the initial containing block (ICB) and visual viewport to diverge (e.g. by overlaying or shifting the ICB), provided that the change is:</p>
+          
+              <ul>
+                <li>associated with the display of additional user interface required to undertake a specific action, such as a keyboard when assistance with form input is required or an address bar when the user needs to navigate or to a new location, and</li>
+                <li>
+                  <p>temporary by design such that:</p>
+                  <ul>
+                    <li>the user interface only appears when required or requested by the user, and</li>
+                    <li>the additional user interface is removed when the user completes the action, dismisses it or undertakes an unrelated action.</li>
+                  </ul>
+                </li>
+              </ul>
+  
+              <p>Any other change must result in a realignment of the ICB with the visual viewport and a corresponding change of viewport-percentage length units.</p>          
+            </blockquote>
+  
+            <section id="sec-consequences">
+              <header><h4>Consequences</h4></header>
+  
+              <ul>
+                <li>This proposed change keeps the definition of the viewport-percentage length units in tact, and so there are very few, if any, negatives for developers. There are no backwards compatibility issues.</li>
+                <li>In the short term, mobile browsers will have to update/improve their toolbar hide/reveal designs to ensure that content truncation in situations like the <code>100vh</code> examples above is only temporary. This will improve matters for developers.</li>
+                <li>In the longer term, mobile browsers may wish to rethink the way toolbar hide/reveal is linked to scroll altogether. (See the next section on <a href="#sec-mobile-browser-design">mobile browser design</a>.)</li>
+                <li>This change, which permits temporary/brief truncation/overlaying of content will likely satisfy most developers. However, there may be some developers for whom any truncation of content, even if temporary, will be unacceptable and so for whom this proposal will not suffice. For example, developers may wish to position content next to the to the visual viewport boundary at all times, even when an toolbar or form input keyboard control is present (and perhaps even on pinch-zoom?) For those developers, only <a href="#sec-but-i-really-need-want-a-visual-viewport-percentage-length-unit">new <em>visual-viewport-percentage-length</em> units</a> are likely to satisfy them.</li>
+              </ul>
+            </section>
+          </section>
+  
+          <section id="sec-mobile-browser-design">
+  
+            <header>
+              <h3>Mobile Browser Design</h3>
+            </header>
+  
+            <p>Let's consider the implications of the proposed change to the CSS specification for the design of the toolbar hide/reveal feature in mobile browsers (or possibly even on desktop browsers in future). The aim is to maximise the amount of space available for content and make it as easy as possible to load content when there is none. So let's assume that: </p>
+  
+            <ul>
+              <li>the default state when there is no loaded content will be for the toolbars to be shown, and</li>
+              <li>the default state when content has been loaded will be for toolbars to be hidden and for the visual viewport to be its maximum size.</li>
+            </ul>
+  
+            <p>There are only a few possibilities for showing/hiding the toolbars when there is content present:</p>
+  
+            <ul>
+              <li><strong>Expand/Contract:</strong> Keep the initial containing block coincident with the visual viewport at all times. This may result in reflow as the toolbars appear and disappear though, which was one of the original problems, so let's avoid this. See <a href="#fig-design-expand-contract">Figure 7</a>. This leaves two options:</li>
+              <li><strong>Overlay:</strong> Define the initial containing block such that it is coincident with the visual viewport when the toolbars are hidden, and so it has a fixed position and its maximal size as zero pinch-zoom. In that case the toolbars will overlay the content while it is present. Depending on the content, this may be more palatable when a single address bar is at the bottom of the screen compared to the top. See <a href="#fig-design-overlay">Figure 8</a>. This approach has an advantage in that the user can be made aware that the content is being obscured, for example, by using an translucent background.</li>
+              <li><strong>Shift/Truncate:</strong> Give the initial containing block its maximum possible size, that of the visual viewport with the toolbars hidden, but move it with one of the toolbars so that it is always adjacent to it (e.g. with origin coincident with that of the visual viewport). This causes content to be truncated at the opposite side when toolbars are present. Depending on the content, this may be more palatable when a single address bar is at the top (and so with the bottom temporarily truncated) than at the bottom (with the top temporarily truncated). See <a href="#fig-design-shift-truncate">Figure 9</a>.</li>
+            </ul>
+  
+            <p>The second and third options above are effectively what is implemented right now.</p>
+  
+            <div class="row">
+  
+              <div class="col-md-4">
+                <div id="fig-design-expand-contract" class="d-flex flex-column align-items-center">
+                  <figure class="card">
+                    <div class="card-body d-flex flex-row justify-content-center">
+                      <div class="global-coord-system">
+                        <div class="canvas content-size">
+                          <div class="content">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                          </div>
+                          <div class="canvas-area toolbar">
+                            http://...
+                          </div>
+                          <div class="canvas-area initial-containing-block">
+                          </div>
+                          <div class="canvas-area visual-viewport">
+                          </div>
+                        </div>  
+                      </div>
+                    </div>
+                    <figcaption class="card-footer">Figure 7: Toolbar hide/reveal via visual viewport expand/contract. See <a href="#fig-key">the key</a>.</figcaption>
+                  </figure>  
+                </div>
+      
+              </div>
+  
+              <div class="col-md-4">
+  
+                <div id="fig-design-overlay" class="d-flex flex-column align-items-center">
+                  <figure class="card">
+                    <div class="card-body d-flex flex-row justify-content-center">
+                      <div class="global-coord-system">
+                        <div class="canvas content-size">
+                          <div class="content">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                          </div>
+                          <div class="canvas-area toolbar">
+                            http://...
+                          </div>
+                          <div class="canvas-area initial-containing-block">
+                          </div>
+                          <div class="canvas-area visual-viewport">
+                          </div>
+                        </div>  
+                      </div>
+                    </div>
+                    <figcaption class="card-footer">Figure 8: Toolbar hide/reveal via visual viewport overlay (and with toolbar at the bottom). See <a href="#fig-key">the key</a>.</figcaption>
+                  </figure>  
+                </div>
+      
+              </div>
+  
+              <div class="col-md-4">
+  
+                <div id="fig-design-shift-truncate" class="d-flex flex-column align-items-center">
+                  <figure class="card">
+                    <div class="card-body d-flex flex-row justify-content-center">
+                      <div class="global-coord-system">
+                        <div class="canvas content-size">
+                          <div class="content">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                          </div>
+                          <div class="canvas-area toolbar">
+                            http://...
+                          </div>
+                          <div class="canvas-area initial-containing-block">
+                          </div>
+                          <div class="canvas-area visual-viewport">
+                          </div>
+                        </div>  
+                      </div>
+                    </div>
+                    <figcaption class="card-footer">Figure 9: Toolbar hide/reveal via visual viewport shift/truncate (and with toolbar bar at the top). See <a href="#fig-key">the key</a>.</figcaption>
+                  </figure>  
+                </div>
+  
+              </div>
+  
+            </div>
+  
+            <p>The place where there is flexibility in design is how and when to make the toolbar transition from shown to hidden (and vice-versa). This is also the point at which security considerations need to play a role, since it should be possible to inspect the address and any associated security indications provided by the browser to verify whether that the user has reached the site they wanted so that they can start to judge whether it is safe/trustworthy, and it should not be possible for a web page to redirect a user somewhere else without their knowledge. This is also the point at which the proposed changed to the CSS specification has an impact. The overlay and shift/truncate options both result in a divergence of the initial containing block from the visual viewport and hence truncation of content. The proposed change implies that this can only be brief and for a specific action.</p>
+            
+            <p>Let's start by considering what happens when the address bar is first used to load some content. The address bar must be shown while the browser is navigating/redirecting etc. so that the user can see that happening, and the address bar probably ought to hang around for a short minimum period after that has completed so that the user can see where they have ended up. It could be useful to keep it around for a short while (seconds?) after the content has fully loaded/rendered too, in case the user wishes to immediately go back or move somewhere else once they've seen what it is. After that however, there is no need for it to stick around, so it could simply be moved out the way, with a transition so that the user can see where it has gone, revealing the full content (initial containing block) without truncation. For a single toolbar (address bar), if the address bar auto-hides like that, then to retrieve it the user could perhaps swipe away from the edge it disappeared to, like pulling out a drawer. For the multiple toolbar case, swiping one way (e.g. swipe up = scroll down) to hide and the other (e.g. swipe down = scroll up) to reveal seems sensible. If the web page provokes a redirect while the address bar is hidden, then the address bar ought to appear immediately at that point so that the user can see what is going on. (This may suit a overlay approach better than a shift/truncate one.)</p>
+  
+            <p>With such an approach, the example problem cases above cease to be problematic. The user gets to see the whole viewport shortly after the page has loaded, even if they do nothing.</p>
+  
+            <p>If auto-hiding is too much of a jump and so a user action is required to trigger the toolbar hide/reveal, then there are things that can be done to improve the current design and which would ameliorate the problem cases covered above:</p>
+            
+            <ul>
+              <li>Most users will put their finger on the screen and swipe to see what there is when the page has loaded. So, why not tie the toolbar show/hide into the vertical swipe gesture, such that it <em>always</em> shows/hides the toolbars when you swipe in a given direction, before any scroll action happens (whether or not there is an scrollable content)? This would improve/fix the behaviour for the <code>100vh</code> examples, which don't have scrollable outermost content, above.</li>
+              <li>If sticking with linkage of toolbar hide/reveal to scroll specifically, then it could be triggered on scroll of any scrollable region that takes up a large fraction of visual viewport, so that the user does not need to scroll through a large amount of content before the address bar is hidden.</li>
+              <li>Another possibility could be to link the toolbar hide/reveal to scrolling of the outermost scrollable region (rather than the canvas).</li>
+              <li>Use of an overlay approach in combination with a translucent toolbar background can be advantageous because it allows users to see when content is being obscured by a toolbar.</li>
+            </ul>
+  
+            <p>The key point, however, is that there is no real reason why the hiding of the toolbar has to be linked into a user action, nor is there any real reason why it should be tied to scrolling or scrolling of the canvas specifically.</p>
+  
+          </section>
+        </section>
+  
+        <section id="sec-but-i-really-need-want-a-visual-viewport-percentage-length-unit">
+  
+          <header>
+            <h2>But I <em>really</em> need/want a <em>visual</em>-viewport-percentage length unit!</h2>
+          </header>
+  
+          <p>There might be developers who insist that they wish to position/size/scale their content relative to the visual viewport at all times, even if toolbars or a keyboard is activated and a content reflow is provoked (with a likely exception being on pinch-zoom). Personally, I doubt I would find a use for this if mobile browser design could be improved, but I accept that there might be some designers/developers who would still want it.</p>
+  
+          <p>Providing there is no technical reason why units that achieve the above cannot easily be created and provided calculating them doesn't put undue computational burden on the browser, why not just create such units to make such developers happy? Depending on how they are used, there will be situations where the performance and overall effect will be good, and others where it won't. Developers will have to test and work that out for themselves.</p>
+  
+          <dl>
+            <dt><dfn>vvw unit</dfn></dt>
+            <dd>A length that is equal to 1% of the width of the visual viewport at zero pinch-zoom, and which scales and maintains its position relative to the initial containing block on pinch-zoom.</dd>
+            <dt><dfn>vvh unit</dfn></dt>
+            <dd>A length that is equal to 1% of the height of the visual viewport at zero pinch-zoom, and which scales and maintains its position relative to the initial containing block on pinch-zoom</dd>
+            <dt><dfn>vvmin unit</dfn></dt>
+            <dd>A length equal to the smaller of vvw or vvh</dd>
+            <dt><dfn>vvmax unit</dfn></dt>
+            <dd>A length equal to the larger of vvw or vvh</dd>
+          </dl>
+  
+        </section>
+        <section id="sec-conclusion">
+          <header>
+            <h2>Conclusion</h2>
+          </header>
+  
+          <p>To resolve problems relating to truncation of content using viewport-percentage length units on mobile browsers in a way that keeps everyone happy, I suggest that the following changes should be made to the CSS specification and mobile browser design:</p>
+  
+          <ol>
+            <li><strong>Update the CSS specification</strong> to make it clear that the initial containing block can deviate from the visual viewport, but only briefly and for a specific purpose.</li>
+            <li><strong>Improve current mobile browser design</strong> to ensure that dynamic toolbars always get out the way, exposing the full content whenever they are not needed — and in particular for the <code>100vh</code> cases where that is not happening at present. A consistent approach amongst mobile browsers would be helpful, but is not essential.</li>
+            <li><strong>Introduce <em>visual</em>-viewport-percentage length units</strong>, for those developers who want or need them.</li>
+          </ol>
+        </section>
+  
+      </div>
+
+    </article>
+  </body>
+</html>
